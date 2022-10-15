@@ -1,0 +1,11 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  background: #222;
+  color: #fff;
+}
+a {
+  color: #fff;
+  text-decoration: none;
+}
