@@ -2,33 +2,33 @@
   <div class="game-board">
     <word-card
       class="game-board__item"
-      v-for="word in wordsArray"
+      v-for="word of board.words"
       :key="word.id"
-      :word="word.name"
-      :color="word.color"
+      :word="word"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import wordsArray from "@/assets/words";
+import { Board } from "@/interfaces/game";
+import { defineComponent, PropType } from "vue";
 import WordCard from "@/components/WordCard.vue";
 
 export default defineComponent({
+  props: {
+    board: {
+      type: Object as PropType<Board>,
+    },
+  },
   components: {
     WordCard,
-  },
-  setup() {
-    return {
-      wordsArray,
-    };
   },
 });
 </script>
 
 <style scoped>
 .game-board {
+  max-width: 900px;
   width: 100%;
   flex-grow: 1;
   display: grid;

@@ -42,7 +42,8 @@ export default defineComponent({
 .team {
   padding: 8px;
   height: 50vh;
-  width: 250px;
+  width: 100%;
+  max-width: 150px;
   display: flex;
   flex-direction: column;
 }
