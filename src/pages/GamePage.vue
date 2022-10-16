@@ -1,5 +1,6 @@
 <template>
   <div class="game">
+    <spectators-block />
     <div class="game__row">
       <team-block :teamColor="'red'"></team-block>
       <game-board class="game-board" />
@@ -11,9 +12,10 @@
 <script>
 import TeamBlock from "@/components/TeamBlock.vue";
 import GameBoard from "@/components/GameBoard.vue";
+import SpectatorsBlock from "@/components/SpectatorsBlock.vue";
 
 export default {
-  components: { TeamBlock, GameBoard },
+  components: { TeamBlock, GameBoard, SpectatorsBlock },
   setup() {
     const n = 10;
     return {
