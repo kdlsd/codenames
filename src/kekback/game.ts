@@ -23,7 +23,14 @@ export const genWords = () => {
   words.push(...pick(9, Color.BLUE));
   words.push(...pick(7, Color.NEUTRAL));
 
-  console.log(words);
+  shuffle(words);
 
   return words;
 };
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
