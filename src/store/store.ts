@@ -41,6 +41,15 @@ export const useGameStore = defineStore("game", {
     IsCorrectTeamTurn(): boolean {
       return this.SearchPlayer.team === this.turn;
     },
+    UnsolvedRedWords(): number {
+      return this.board.filter((word) => word.color === "red" && !word.revealed)
+        .length;
+    },
+    UnsolvedBlueWords(): number {
+      return this.board.filter(
+        (word) => word.color === "blue" && !word.revealed
+      ).length;
+    },
   },
 
   actions: {
@@ -89,6 +98,9 @@ export const useGameStore = defineStore("game", {
       this.board = genWords();
       this.turn = "red";
       this.isGameOn = true;
+    },
+    CorrectUnsolvedWords(color: string): number {
+      return color === "red" ? this.UnsolvedRedWords : this.UnsolvedBlueWords;
     },
   },
 });

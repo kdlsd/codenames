@@ -44,11 +44,14 @@
         >Стать игроком</join-to-placeholder
       >
     </div>
+    <div class="unsolved">
+      <span>{{ store.CorrectUnsolvedWords(props.teamColor) }}</span>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import TeamColor from "@/types/TeamColor";
 import JoinToPlaceholder from "@/components/JoinToPlaceholder.vue";
 import { useGameStore } from "@/store/store";
@@ -80,6 +83,7 @@ export default defineComponent({
   max-width: 150px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .master {
   position: relative;
@@ -108,5 +112,14 @@ export default defineComponent({
 }
 .player {
   padding: 3px;
+}
+.unsolved {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 30px;
+}
+.unsolved span {
+  font-size: 64px;
 }
 </style>

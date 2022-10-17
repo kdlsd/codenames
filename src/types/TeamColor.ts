@@ -1,2 +1,2 @@
-type TeamColor = "team-red" | "team-blue";
+type TeamColor = "red" | "blue";
 export default TeamColor;

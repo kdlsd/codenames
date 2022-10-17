@@ -17,8 +17,8 @@ export const genWords = () => {
   const words = [];
 
   words.push(...pick(1, Color.BLACK));
-  words.push(...pick(8, Color.RED));
-  words.push(...pick(9, Color.BLUE));
+  words.push(...pick(9, Color.RED));
+  words.push(...pick(8, Color.BLUE));
   words.push(...pick(7, Color.NEUTRAL));
 
   shuffle(words);
