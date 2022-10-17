@@ -7,10 +7,42 @@
     }"
   >
     <div class="master">
-      <join-to-placeholder>Стать капитаном</join-to-placeholder>
+      <div class="master__row">
+        <div
+          class="player"
+          v-for="player in store.PlayersOnThisTeam(
+            props.teamColor,
+            placeMaster
+          )"
+          :key="player.id"
+        >
+          {{ player.nickname }}
+        </div>
+      </div>
+      <join-to-placeholder
+        @click="store.SwitchPlace(placeMaster, props.teamColor)"
+        :place="placeMaster"
+        v-show="
+          store.PlayersOnThisTeam(props.teamColor, placeMaster).length === 0
+        "
+        >Стать капитаном</join-to-placeholder
+      >
     </div>
-    <div class="players">
-      <join-to-placeholder>Стать игроком</join-to-placeholder>
+    <div class="members">
+      <div class="members__row">
+        <div
+          class="player"
+          v-for="player in store.PlayersOnThisTeam(teamColor, placeMember)"
+          :key="player.id"
+        >
+          {{ player.nickname }}
+        </div>
+      </div>
+      <join-to-placeholder
+        :place="placeMember"
+        @click="store.SwitchPlace(placeMember, props.teamColor)"
+        >Стать игроком</join-to-placeholder
+      >
     </div>
   </div>
 </template>
@@ -19,6 +51,7 @@
 import { defineComponent, PropType } from "vue";
 import TeamColor from "@/types/TeamColor";
 import JoinToPlaceholder from "@/components/JoinToPlaceholder.vue";
+import { useGameStore } from "@/store/store";
 
 export default defineComponent({
   components: {
@@ -31,9 +64,10 @@ export default defineComponent({
     },
   },
   setup(props) {
-    return {
-      props,
-    };
+    const placeMaster = "master";
+    const placeMember = "member";
+    const store = useGameStore();
+    return { store, props, placeMember, placeMaster };
   },
 });
 </script>
@@ -67,5 +101,12 @@ export default defineComponent({
 .team-blue {
   background: rgba(0, 0, 255, 0.3);
   border-right: 2px solid blue;
+}
+.players__row {
+  display: flex;
+  flex-direction: column;
+}
+.player {
+  padding: 3px;
 }
 </style>

@@ -11,16 +11,15 @@
 
 <script setup lang="ts">
 import { genWords } from "@/kekback/game";
-import { toRef } from "vue";
 import TeamBlock from "@/components/TeamBlock.vue";
 import GameBoard from "@/components/GameBoard.vue";
 import SpectatorsBlock from "@/components/SpectatorsBlock.vue";
-import { useCounterStore } from "@/store/store";
-import { storeToRefs } from "pinia";
-import { Color } from "@/interfaces/game";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 
 const game = {
-  id: 1,
+  id: route.params.id,
   board: {
     words: genWords(),
   },

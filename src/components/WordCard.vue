@@ -5,9 +5,8 @@
 </template>
 
 <script lang="ts">
-import WordColor from "@/types/WordColor";
 import { Word } from "@/interfaces/game";
-import { defineComponent, PropType, computed, toRefs } from "vue";
+import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
@@ -15,14 +14,6 @@ export default defineComponent({
       type: Object as PropType<Word>,
       required: true,
     },
-  },
-  setup(props) {
-    // const { word } = toRefs(props);
-
-    return {};
-    // return {
-    //   word,
-    // };
   },
 });
 </script>

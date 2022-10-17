@@ -16,8 +16,6 @@ const pick = (n: number, color: Color): any[] => {
 export const genWords = () => {
   const words = [];
 
-  console.log(pick(1, Color.BLACK));
-
   words.push(...pick(1, Color.BLACK));
   words.push(...pick(8, Color.RED));
   words.push(...pick(9, Color.BLUE));
