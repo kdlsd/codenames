@@ -2,9 +2,10 @@
   <div class="game-board">
     <word-card
       class="game-board__item"
-      v-for="word of board.words"
-      :key="word.id"
+      v-for="word of store.board"
+      :key="word.text"
       :word="word"
+      @click="store.SelectCard(word)"
     />
   </div>
 </template>
@@ -13,6 +14,7 @@
 import { Board } from "@/interfaces/game";
 import { defineComponent, PropType } from "vue";
 import WordCard from "@/components/WordCard.vue";
+import { useGameStore } from "@/store/store";
 
 export default defineComponent({
   props: {
@@ -22,6 +24,10 @@ export default defineComponent({
   },
   components: {
     WordCard,
+  },
+  setup() {
+    const store = useGameStore();
+    return { store };
   },
 });
 </script>

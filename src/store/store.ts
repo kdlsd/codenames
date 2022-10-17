@@ -1,9 +1,12 @@
 import { defineStore } from "pinia";
 import Player from "@/interfaces/Player";
 import getCookie from "@/scripts/getCookies";
+import { Word } from "@/interfaces/game";
+import { genWords } from "@/kekback/game";
 
 interface GameState {
   players: Array<Player>;
+  board: Array<Word>;
 }
 
 export const useGameStore = defineStore("game", {
@@ -17,6 +20,7 @@ export const useGameStore = defineStore("game", {
         },
         { nickname: "Penis", place: null, id: "122" },
       ],
+      board: genWords(),
     } as GameState;
   },
 
@@ -47,6 +51,9 @@ export const useGameStore = defineStore("game", {
         const id = "id=" + Math.ceil(Math.random() * 10000);
         document.cookie = id;
       }
+    },
+    SelectCard(card: Word): void {
+      this.board.find((word) => word === card).revealed = true;
     },
   },
 });

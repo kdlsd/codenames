@@ -1,5 +1,11 @@
 <template>
-  <div class="card" :class="`bg-` + color">
+  <div
+    class="card"
+    :class="[
+      `bg-${color}`,
+      { revealed: word.revealed && store.HasPermissionToWatchColor },
+    ]"
+  >
     <span>{{ word.text }}</span>
   </div>
 </template>
@@ -19,15 +25,18 @@ export default defineComponent({
   setup(props) {
     const store = useGameStore();
     const color = computed(() => {
-      return store.HasPermissionToWatchColor ? props.word.color : "unknown";
+      if (store.HasPermissionToWatchColor || props.word.revealed)
+        return props.word.color;
+      return "unknown";
     });
-    return { color };
+    return { color, store };
   },
 });
 </script>
 
 <style scoped>
 .card {
+  position: relative;
   cursor: pointer;
   border-radius: 3px;
   color: #000;
@@ -63,5 +72,16 @@ export default defineComponent({
 .bg-unknown {
   color: #444;
   background: rgba(222, 197, 179, 0.81);
+}
+.revealed::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  background: #000;
+  opacity: 0.7;
 }
 </style>

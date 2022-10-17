@@ -10,7 +10,6 @@
 </template>
 
 <script setup lang="ts">
-import { genWords } from "@/kekback/game";
 import TeamBlock from "@/components/TeamBlock.vue";
 import GameBoard from "@/components/GameBoard.vue";
 import SpectatorsBlock from "@/components/SpectatorsBlock.vue";
@@ -22,9 +21,6 @@ const route = useRoute();
 
 const game = {
   id: route.params.id,
-  board: {
-    words: genWords(),
-  },
 };
 </script>
 
