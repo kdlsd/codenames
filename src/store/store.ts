@@ -12,11 +12,10 @@ export const useGameStore = defineStore("game", {
       players: [
         {
           nickname: "Hui",
-          place: "spectator",
-          team: "red",
+          place: null,
           id: getCookie("id"),
         },
-        { nickname: "Penis", place: "member", team: "blue", id: "122" },
+        { nickname: "Penis", place: null, id: "122" },
       ],
     } as GameState;
   },
@@ -24,6 +23,9 @@ export const useGameStore = defineStore("game", {
   getters: {
     SearchPlayer(): Player {
       return this.players.filter((elem) => elem.id === getCookie("id"))[0];
+    },
+    HasPermissionToWatchColor(): boolean {
+      return this.SearchPlayer.place === "master";
     },
   },
 
@@ -39,6 +41,12 @@ export const useGameStore = defineStore("game", {
     SwitchPlace(place, team = null): void {
       this.SearchPlayer.place = place;
       this.SearchPlayer.team = team;
+    },
+    SetIdForPlayer(): void {
+      if (getCookie("id") === undefined) {
+        const id = "id=" + Math.ceil(Math.random() * 10000);
+        document.cookie = id;
+      }
     },
   },
 });

@@ -1,12 +1,13 @@
 <template>
-  <div class="card" :class="`bg-` + word.color">
+  <div class="card" :class="`bg-` + color">
     <span>{{ word.text }}</span>
   </div>
 </template>
 
 <script lang="ts">
 import { Word } from "@/interfaces/game";
-import { defineComponent, PropType } from "vue";
+import { useGameStore } from "@/store/store";
+import { computed, defineComponent, PropType, ref } from "vue";
 
 export default defineComponent({
   props: {
@@ -14,6 +15,13 @@ export default defineComponent({
       type: Object as PropType<Word>,
       required: true,
     },
+  },
+  setup(props) {
+    const store = useGameStore();
+    const color = computed(() => {
+      return store.HasPermissionToWatchColor ? props.word.color : "unknown";
+    });
+    return { color };
   },
 });
 </script>
@@ -51,5 +59,9 @@ export default defineComponent({
   background: #444;
   color: #aaa;
   box-shadow: 0 0 0 20px rgb(68 68 68 / 0%);
+}
+.bg-unknown {
+  color: #444;
+  background: rgba(222, 197, 179, 0.81);
 }
 </style>

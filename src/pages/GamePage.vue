@@ -15,6 +15,8 @@ import TeamBlock from "@/components/TeamBlock.vue";
 import GameBoard from "@/components/GameBoard.vue";
 import SpectatorsBlock from "@/components/SpectatorsBlock.vue";
 import { useRoute } from "vue-router";
+import { onMounted } from "vue-demi";
+import { useGameStore } from "@/store/store";
 
 const route = useRoute();
 

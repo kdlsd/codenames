@@ -26,7 +26,7 @@ export default defineComponent({
     JoinToPlaceholder,
   },
   setup() {
-    const place = "spectator";
+    const place = null;
     const store = useGameStore();
     return { store, place };
   },
