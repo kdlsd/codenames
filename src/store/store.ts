@@ -14,11 +14,11 @@ export const useGameStore = defineStore("game", {
     return {
       players: [
         {
-          nickname: "Hui",
+          nickname: "Егор",
           place: null,
           id: getCookie("id"),
         },
-        { nickname: "Penis", place: null, id: "122" },
+        { nickname: "Влад", place: null, id: "122" },
       ],
       board: genWords(),
     } as GameState;
