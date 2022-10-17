@@ -1,7 +1,10 @@
 <template>
   <div class="spectators-block">
     <span>Наблюдатели: </span>
-    <join-to-placeholder @click="store.SwitchPlace(place)" :place="place"
+    <join-to-placeholder
+      v-show="!store.HidePlaceholderTojoin(null, null)"
+      @click="store.SwitchPlace(place)"
+      :place="place"
       >...</join-to-placeholder
     >
     <div class="spectators__row">

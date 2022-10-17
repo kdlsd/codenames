@@ -8,7 +8,14 @@ interface GameState {
   players: Array<Player>;
   board: Array<Word>;
   turn: string;
+  hints: Hints;
   isGameOn: boolean;
+  isMasterGiveHint: boolean;
+}
+
+interface Hints {
+  red: Array<string>;
+  blue: Array<string>;
 }
 
 export const useGameStore = defineStore("game", {
@@ -24,7 +31,9 @@ export const useGameStore = defineStore("game", {
       ],
       board: genWords(),
       turn: "red",
+      hints: { red: [], blue: [] },
       isGameOn: true,
+      isMasterGiveHint: true,
     } as GameState;
   },
 
@@ -72,10 +81,16 @@ export const useGameStore = defineStore("game", {
       }
     },
     SelectCard(card: Word): void {
-      if (this.HasPermissionToOpenCard && this.isGameOn) {
+      if (
+        this.HasPermissionToOpenCard &&
+        this.isGameOn &&
+        !this.isMasterGiveHint
+      ) {
         this.board.find((word) => word === card).revealed = true;
         this.SwitchTurn(card.color);
       }
+      if (this.UnsolvedBlueWords === 0 || this.UnsolvedRedWords === 0)
+        this.EndGame();
     },
     SwitchTurn(color: string): void {
       if (color === "black") {
@@ -88,6 +103,7 @@ export const useGameStore = defineStore("game", {
         } else {
           this.turn = "red";
         }
+        this.isMasterGiveHint = true;
       }
     },
     EndGame(): void {
@@ -98,9 +114,19 @@ export const useGameStore = defineStore("game", {
       this.board = genWords();
       this.turn = "red";
       this.isGameOn = true;
+      this.hints = { red: [], blue: [] };
     },
-    CorrectUnsolvedWords(color: string): number {
-      return color === "red" ? this.UnsolvedRedWords : this.UnsolvedBlueWords;
+    CorrectUnsolvedWords(team: string): number {
+      return team === "red" ? this.UnsolvedRedWords : this.UnsolvedBlueWords;
+    },
+    HidePlaceholderTojoin(team: string, place: string): boolean {
+      return (
+        this.SearchPlayer.team === team && this.SearchPlayer.place === place
+      );
+    },
+    AddHint(team: string, hint: string): void {
+      this.hints[team] = [...this.hints[team], hint];
+      this.isMasterGiveHint = false;
     },
   },
 });

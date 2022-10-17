@@ -40,12 +40,36 @@
       </div>
       <join-to-placeholder
         :place="placeMember"
+        v-show="!store.HidePlaceholderTojoin(props.teamColor, 'member')"
         @click="store.SwitchPlace(placeMember, props.teamColor)"
         >Стать игроком</join-to-placeholder
       >
     </div>
     <div class="unsolved">
       <span>{{ store.CorrectUnsolvedWords(props.teamColor) }}</span>
+    </div>
+    <div class="hint">
+      <ul class="hint__list">
+        <li
+          class="hint__item"
+          v-for="(hint, index) in store.hints[props.teamColor]"
+          :key="index"
+        >
+          {{ hint }}
+        </li>
+      </ul>
+      <input
+        type="text"
+        v-model="currentHint"
+        v-show="
+          store.turn === props.teamColor &&
+          store.SearchPlayer.place === 'master' &&
+          store.SearchPlayer.team === props.teamColor &&
+          store.isMasterGiveHint
+        "
+        @keydown.enter="addHint()"
+        class="hint__input"
+      />
     </div>
   </div>
 </template>
@@ -67,10 +91,17 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const currentHint = ref("");
     const placeMaster = "master";
     const placeMember = "member";
     const store = useGameStore();
-    return { store, props, placeMember, placeMaster };
+    function addHint(): void {
+      if (currentHint.value !== "") {
+        store.AddHint(props.teamColor, currentHint.value);
+        currentHint.value = "";
+      }
+    }
+    return { store, props, placeMember, placeMaster, currentHint, addHint };
   },
 });
 </script>
@@ -78,7 +109,7 @@ export default defineComponent({
 <style scoped>
 .team {
   padding: 8px;
-  height: 50vh;
+  height: 70vh;
   width: 100%;
   max-width: 150px;
   display: flex;
@@ -106,20 +137,38 @@ export default defineComponent({
   background: rgba(0, 0, 255, 0.3);
   border-right: 2px solid blue;
 }
-.players__row {
+.members__row {
   display: flex;
   flex-direction: column;
 }
-.player {
+.members {
+  flex-grow: 1;
   padding: 3px;
+}
+.team-red .unsolved {
+  color: #ff6450;
+}
+.team-blue .unsolved {
+  color: #50bbff;
 }
 .unsolved {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 30px;
+  bottom: 200px;
 }
 .unsolved span {
-  font-size: 64px;
+  font-size: 215px;
+  font-family: "Roboto Condensed", sans-serif;
+  opacity: 0.5;
+}
+.hint {
+  margin-bottom: 10px;
+}
+.hint__list {
+  list-style-type: none;
+}
+.hint__input {
+  width: 100%;
 }
 </style>
