@@ -1,6 +1,6 @@
 <template>
   <nav class="nav">
-    <router-link class="btn" to="/game">Старт</router-link>
+    <router-link class="btn" to="/game/awd">Старт</router-link>
   </nav>
 </template>
 

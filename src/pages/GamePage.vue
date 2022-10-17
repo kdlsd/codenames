@@ -1,5 +1,6 @@
 <template>
   <div class="game">
+    <button @click="store.RestartGame()" class="restart">рестарт</button>
     <spectators-block />
     <div class="game__row">
       <team-block :teamColor="'red'"></team-block>
@@ -18,6 +19,7 @@ import { onMounted } from "vue-demi";
 import { useGameStore } from "@/store/store";
 
 const route = useRoute();
+const store = useGameStore();
 
 const game = {
   id: route.params.id,
@@ -61,5 +63,11 @@ export default {
   justify-content: space-between;
   align-items: center;
   gap: 10vw;
+}
+
+.restart {
+  position: absolute;
+  left: 50%;
+  top: 100px;
 }
 </style>

@@ -7,6 +7,8 @@ import { genWords } from "@/kekback/game";
 interface GameState {
   players: Array<Player>;
   board: Array<Word>;
+  turn: string;
+  isGameOn: boolean;
 }
 
 export const useGameStore = defineStore("game", {
@@ -21,6 +23,8 @@ export const useGameStore = defineStore("game", {
         { nickname: "Влад", place: null, id: "122" },
       ],
       board: genWords(),
+      turn: "red",
+      isGameOn: true,
     } as GameState;
   },
 
@@ -30,6 +34,12 @@ export const useGameStore = defineStore("game", {
     },
     HasPermissionToWatchColor(): boolean {
       return this.SearchPlayer.place === "master";
+    },
+    HasPermissionToOpenCard(): boolean {
+      return this.SearchPlayer.place === "member" && this.IsCorrectTeamTurn;
+    },
+    IsCorrectTeamTurn(): boolean {
+      return this.SearchPlayer.team === this.turn;
     },
   },
 
@@ -53,7 +63,32 @@ export const useGameStore = defineStore("game", {
       }
     },
     SelectCard(card: Word): void {
-      this.board.find((word) => word === card).revealed = true;
+      if (this.HasPermissionToOpenCard && this.isGameOn) {
+        this.board.find((word) => word === card).revealed = true;
+        this.SwitchTurn(card.color);
+      }
+    },
+    SwitchTurn(color: string): void {
+      if (color === "black") {
+        this.EndGame();
+        return;
+      }
+      if (this.SearchPlayer.team !== color) {
+        if (this.turn === "red") {
+          this.turn = "blue";
+        } else {
+          this.turn = "red";
+        }
+      }
+    },
+    EndGame(): void {
+      this.isGameOn = false;
+      this.board.map((elem) => (elem.revealed = true));
+    },
+    RestartGame(): void {
+      this.board = genWords();
+      this.turn = "red";
+      this.isGameOn = true;
     },
   },
 });
