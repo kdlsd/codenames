@@ -5,7 +5,13 @@
       <button @click="store.StartGame" v-show="!store.isGameOn" class="btn">
         Старт
       </button>
+      <button @click="store.ChangeStateModal" class="btn">
+        Сменить никнейм
+      </button>
     </div>
+    <modal-with-input v-show="store.isModalOpen"
+      >Введите новый никнейм</modal-with-input
+    >
 
     <spectators-block />
     <div class="game__row">
@@ -23,6 +29,7 @@ import SpectatorsBlock from "@/components/SpectatorsBlock.vue";
 import { useRoute } from "vue-router";
 import { onMounted } from "vue-demi";
 import { useGameStore } from "@/store/store";
+import ModalWithInput from "@/components/ModalWithInput.vue";
 
 const route = useRoute();
 const store = useGameStore();

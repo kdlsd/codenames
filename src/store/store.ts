@@ -17,6 +17,7 @@ interface GameState {
   timeForMembers: number;
   currentTimer: string;
   idForStopTimer: null | number;
+  isModalOpen: boolean;
 }
 
 interface Hints {
@@ -36,9 +37,10 @@ export const useGameStore = defineStore("game", {
         {
           nickname: "Егор",
           place: null,
+          team: null,
           id: getCookie("id"),
         },
-        { nickname: "Влад", place: null, id: "122" },
+        { nickname: "Влад", place: null, team: null, id: "122" },
       ],
       board: genWords(),
       turn: "red",
@@ -51,6 +53,7 @@ export const useGameStore = defineStore("game", {
       timeForMembers: 61,
       currentTimer: "",
       idForStopTimer: null,
+      isModalOpen: false,
     } as GameState;
   },
 
@@ -150,7 +153,7 @@ export const useGameStore = defineStore("game", {
     },
     HidePlaceholderTojoin(team: string, place: string): boolean {
       return (
-        this.SearchPlayer.team === team && this.SearchPlayer.place === place
+        this.SearchPlayer?.team === team && this.SearchPlayer.place === place
       );
     },
     AddHint(team: string, hint: string): void {
@@ -192,6 +195,13 @@ export const useGameStore = defineStore("game", {
       if (timer.seconds < 10) timer.seconds = "0" + timer.seconds;
       this.currentTimer =
         timer.minutes.toString() + ":" + timer.seconds.toString();
+    },
+    ChangeStateModal(): void {
+      this.isModalOpen = !this.isModalOpen;
+    },
+    ChangeNickname(nickname: string): void {
+      this.SearchPlayer.nickname = nickname;
+      this.ChangeStateModal();
     },
   },
 });
