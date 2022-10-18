@@ -11,11 +11,22 @@ interface GameState {
   hints: Hints;
   isGameOn: boolean;
   isMasterGiveHint: boolean;
+  valueOfTimerMaster: number;
+  valueOfTimerMembers: number;
+  timeForMaster: number;
+  timeForMembers: number;
+  currentTimer: string;
+  idForStopTimer: null | number;
 }
 
 interface Hints {
   red: Array<string>;
   blue: Array<string>;
+}
+
+interface Timer {
+  minutes: string | number;
+  seconds: string | number;
 }
 
 export const useGameStore = defineStore("game", {
@@ -32,8 +43,14 @@ export const useGameStore = defineStore("game", {
       board: genWords(),
       turn: "red",
       hints: { red: [], blue: [] },
-      isGameOn: true,
+      isGameOn: false,
       isMasterGiveHint: true,
+      valueOfTimerMaster: 61,
+      valueOfTimerMembers: 61,
+      timeForMaster: 61,
+      timeForMembers: 61,
+      currentTimer: "",
+      idForStopTimer: null,
     } as GameState;
   },
 
@@ -87,34 +104,46 @@ export const useGameStore = defineStore("game", {
         !this.isMasterGiveHint
       ) {
         this.board.find((word) => word === card).revealed = true;
-        this.SwitchTurn(card.color);
+        this.CheckTurn(card.color);
       }
       if (this.UnsolvedBlueWords === 0 || this.UnsolvedRedWords === 0)
         this.EndGame();
     },
-    SwitchTurn(color: string): void {
+    SwitchTurn(): void {
+      if (this.turn === "red") {
+        this.turn = "blue";
+      } else {
+        this.turn = "red";
+      }
+      this.isMasterGiveHint = true;
+      clearInterval(this.idForStopTimer);
+      this.SetDefaultTimer();
+      this.SetIntervalForTimer("timeForMaster");
+    },
+    CheckTurn(color: string): void {
       if (color === "black") {
         this.EndGame();
         return;
       }
       if (this.SearchPlayer.team !== color) {
-        if (this.turn === "red") {
-          this.turn = "blue";
-        } else {
-          this.turn = "red";
-        }
-        this.isMasterGiveHint = true;
+        this.SwitchTurn();
       }
     },
     EndGame(): void {
       this.isGameOn = false;
       this.board.map((elem) => (elem.revealed = true));
+      clearInterval(this.idForStopTimer);
+      this.SetDefaultTimer();
     },
     RestartGame(): void {
       this.board = genWords();
       this.turn = "red";
-      this.isGameOn = true;
+      this.isGameOn = false;
+      this.isMasterGiveHint = true;
       this.hints = { red: [], blue: [] };
+      clearInterval(this.idForStopTimer);
+      this.SetDefaultTimer();
+      this.SetСurrentTimer("timeForMaster");
     },
     CorrectUnsolvedWords(team: string): number {
       return team === "red" ? this.UnsolvedRedWords : this.UnsolvedBlueWords;
@@ -127,6 +156,42 @@ export const useGameStore = defineStore("game", {
     AddHint(team: string, hint: string): void {
       this.hints[team] = [...this.hints[team], hint];
       this.isMasterGiveHint = false;
+      clearInterval(this.idForStopTimer);
+      this.SetIntervalForTimer("timeForMembers");
+    },
+    StartGame() {
+      this.isGameOn = true;
+      this.SetIntervalForTimer("timeForMaster");
+    },
+    SetIntervalForTimer(place: string) {
+      this.SetTimer(place);
+      this.idForStopTimer = setInterval(this.SetTimer, 1000, place);
+    },
+    SetTimer(place: string): void {
+      this[place] -= 1;
+      this.SetСurrentTimer(place);
+      if (this[place] === 0 && this.timeForMembers === 0) {
+        this.SwitchTurn();
+        return;
+      }
+      if (this[place] === 0) {
+        clearInterval(this.idForStopTimer);
+        this.SetIntervalForTimer("timeForMembers");
+      }
+    },
+    SetDefaultTimer(): void {
+      this.timeForMaster = this.valueOfTimerMaster;
+      this.timeForMembers = this.valueOfTimerMembers;
+    },
+    SetСurrentTimer(place: string): void {
+      const timer: Timer = {
+        minutes: Math.floor(this[place] / 60),
+        seconds: this[place] % 60,
+      };
+      if (timer.minutes < 10) timer.minutes = "0" + timer.minutes;
+      if (timer.seconds < 10) timer.seconds = "0" + timer.seconds;
+      this.currentTimer =
+        timer.minutes.toString() + ":" + timer.seconds.toString();
     },
   },
 });

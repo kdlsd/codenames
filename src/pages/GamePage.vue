@@ -1,6 +1,12 @@
 <template>
   <div class="game">
-    <button @click="store.RestartGame()" class="restart">рестарт</button>
+    <div class="buttons">
+      <button @click="store.RestartGame()" class="btn">Рестарт</button>
+      <button @click="store.StartGame" v-show="!store.isGameOn" class="btn">
+        Старт
+      </button>
+    </div>
+
     <spectators-block />
     <div class="game__row">
       <team-block :teamColor="'red'"></team-block>
@@ -65,7 +71,7 @@ export default {
   gap: 10vw;
 }
 
-.restart {
+.buttons {
   position: absolute;
   left: 50%;
   top: 100px;

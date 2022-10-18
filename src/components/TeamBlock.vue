@@ -48,6 +48,9 @@
     <div class="unsolved">
       <span>{{ store.CorrectUnsolvedWords(props.teamColor) }}</span>
     </div>
+    <div class="timer" v-show="store.turn === props.teamColor">
+      {{ store.currentTimer }}
+    </div>
     <div class="hint">
       <ul class="hint__list">
         <li
@@ -65,7 +68,8 @@
           store.turn === props.teamColor &&
           store.SearchPlayer.place === 'master' &&
           store.SearchPlayer.team === props.teamColor &&
-          store.isMasterGiveHint
+          store.isMasterGiveHint &&
+          store.isGameOn
         "
         @keydown.enter="addHint()"
         class="hint__input"
