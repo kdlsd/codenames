@@ -13,6 +13,7 @@ export default defineComponent({
     const store = useGameStore();
     onMounted(() => {
       store.SetIdForPlayer();
+      store.CheckNickname();
     });
   },
 });

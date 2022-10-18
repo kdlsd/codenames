@@ -35,7 +35,7 @@ export const useGameStore = defineStore("game", {
     return {
       players: [
         {
-          nickname: "Егор",
+          nickname: getCookie("nickname"),
           place: null,
           team: null,
           id: getCookie("id"),
@@ -200,8 +200,12 @@ export const useGameStore = defineStore("game", {
       this.isModalOpen = !this.isModalOpen;
     },
     ChangeNickname(nickname: string): void {
+      document.cookie = "nickname=" + nickname;
       this.SearchPlayer.nickname = nickname;
       this.ChangeStateModal();
+    },
+    CheckNickname(): void {
+      if (getCookie("nickname") === undefined) this.isModalOpen = true;
     },
   },
 });
