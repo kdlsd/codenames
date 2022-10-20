@@ -22,7 +22,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   setup() {
     const store = useGameStore();
-    const value = store.SearchPlayer.nickname || "";
+    const value = store.SearchPlayer?.nickname || "";
     return { store, value };
   },
 });

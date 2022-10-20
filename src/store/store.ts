@@ -18,6 +18,7 @@ interface GameState {
   currentTimer: string;
   idForStopTimer: null | number;
   isModalOpen: boolean;
+  isMasterUseMembersTime: boolean;
 }
 
 interface Hints {
@@ -40,7 +41,10 @@ export const useGameStore = defineStore("game", {
           team: null,
           id: getCookie("id"),
         },
-        { nickname: "Влад", place: null, team: null, id: "122" },
+        { nickname: "Влад", place: "member", team: "red", id: "122" },
+        { nickname: "Антон", place: "master", team: "blue", id: "123" },
+        { nickname: "Вася", place: "member", team: "red", id: "124" },
+        { nickname: "Инна", place: "member", team: "red", id: "125" },
       ],
       board: genWords(),
       turn: "red",
@@ -54,6 +58,7 @@ export const useGameStore = defineStore("game", {
       currentTimer: "",
       idForStopTimer: null,
       isModalOpen: false,
+      isMasterUseMembersTime: false,
     } as GameState;
   },
 
@@ -119,6 +124,7 @@ export const useGameStore = defineStore("game", {
         this.turn = "red";
       }
       this.isMasterGiveHint = true;
+      this.isMasterUseMembersTime = false;
       clearInterval(this.idForStopTimer);
       this.SetDefaultTimer();
       this.SetIntervalForTimer("timeForMaster");
@@ -167,6 +173,9 @@ export const useGameStore = defineStore("game", {
       this.SetIntervalForTimer("timeForMaster");
     },
     SetIntervalForTimer(place: string) {
+      this.timeForMaster = this.valueOfTimerMaster;
+      if (!this.isMasterUseMembersTime)
+        this.timeForMembers = this.valueOfTimerMembers;
       this.SetTimer(place);
       this.idForStopTimer = setInterval(this.SetTimer, 1000, place);
     },
@@ -179,6 +188,8 @@ export const useGameStore = defineStore("game", {
       }
       if (this[place] === 0) {
         clearInterval(this.idForStopTimer);
+        this.isMasterUseMembersTime = true;
+        this.timeForMembers = this.valueOfTimerMembers;
         this.SetIntervalForTimer("timeForMembers");
       }
     },
@@ -206,6 +217,31 @@ export const useGameStore = defineStore("game", {
     },
     CheckNickname(): void {
       if (getCookie("nickname") === undefined) this.isModalOpen = true;
+    },
+    ShufflePlayers(): void {
+      let players = [...this.players.filter((elem) => elem.place !== null)];
+      const length = players.length;
+      for (let i = 0; i < length; i++) {
+        const random = Math.random();
+        const idOfCurrentPlayer =
+          players[Math.round(random * (players.length - 1))].id;
+        const currentPlayer = this.players.find(
+          (elem) => elem.id === idOfCurrentPlayer
+        );
+        if (i < 2) {
+          currentPlayer.place = "master";
+          currentPlayer.team = i === 0 ? "red" : "blue";
+        } else {
+          currentPlayer.place = "member";
+          if (players.length !== 1) {
+            currentPlayer.team = i % 2 === 0 ? "blue" : "red";
+          } else {
+            currentPlayer.team =
+              Math.round(Math.random()) === 1 ? "blue" : "red";
+          }
+        }
+        players = players.filter((elem) => elem !== currentPlayer);
+      }
     },
   },
 });

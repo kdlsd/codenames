@@ -48,8 +48,12 @@
     <div class="unsolved">
       <span>{{ store.CorrectUnsolvedWords(props.teamColor) }}</span>
     </div>
-    <div class="timer" v-show="store.turn === props.teamColor">
-      {{ store.currentTimer }}
+    <div
+      class="timer"
+      v-show="store.turn === props.teamColor && store.isGameOn"
+    >
+      <span>Log</span>
+      <span>{{ store.currentTimer }}</span>
     </div>
     <div class="hint">
       <ul class="hint__list">
@@ -66,9 +70,9 @@
         v-model="currentHint"
         v-show="
           store.turn === props.teamColor &&
-          store.SearchPlayer.place === 'master' &&
-          store.SearchPlayer.team === props.teamColor &&
           store.isMasterGiveHint &&
+          store.SearchPlayer?.place === 'master' &&
+          store.SearchPlayer?.team === props.teamColor &&
           store.isGameOn
         "
         @keydown.enter="addHint()"
@@ -169,10 +173,24 @@ export default defineComponent({
 .hint {
   margin-bottom: 10px;
 }
+.hint::before {
+  content: "";
+  display: block;
+  position: relative;
+  top: 10px;
+  width: 100%;
+  height: 1px;
+  background: #fff;
+}
 .hint__list {
   list-style-type: none;
+  padding: 0;
 }
 .hint__input {
   width: 100%;
+}
+.timer {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

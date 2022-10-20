@@ -8,6 +8,35 @@
       <button @click="store.ChangeStateModal" class="btn">
         Сменить никнейм
       </button>
+      <button @click="store.ShufflePlayers()" class="btn">
+        Перетасовать игроков
+      </button>
+      <div class="time">
+        <div class="time-master">
+          <label class="time__label" for="timeMaster">Время мастера: </label>
+          <input
+            class="time__input"
+            id="timeMaster"
+            type="number"
+            step="1"
+            min="10"
+            max="999"
+            v-model="store.valueOfTimerMaster"
+          />
+        </div>
+        <div class="time-member">
+          <label class="time__label" for="timeMember">Время игроков: </label>
+          <input
+            class="time__input"
+            id="timeMember"
+            type="number"
+            step="1"
+            min="10"
+            max="999"
+            v-model="store.valueOfTimerMembers"
+          />
+        </div>
+      </div>
     </div>
     <modal-with-input v-show="store.isModalOpen"
       >Введите новый никнейм</modal-with-input
@@ -82,5 +111,16 @@ export default {
   position: absolute;
   left: 50%;
   top: 100px;
+}
+.time {
+}
+.time__label {
+}
+.time__input {
+  width: 50px;
+}
+.time-master {
+}
+.time-member {
 }
 </style>
