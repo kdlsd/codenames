@@ -2,9 +2,9 @@
   <div class="spectators-block">
     <span>Наблюдатели: </span>
     <join-to-placeholder
+      :isSpectator="true"
       v-show="!store.HidePlaceholderTojoin(null, null)"
       @click="store.SwitchPlace(place)"
-      :place="place"
       >...</join-to-placeholder
     >
     <div class="spectators__row">

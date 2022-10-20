@@ -117,33 +117,24 @@ export default defineComponent({
 <style scoped>
 .team {
   padding: 8px;
-  height: 70vh;
-  width: 100%;
-  max-width: 150px;
   display: flex;
   flex-direction: column;
   position: relative;
+  width: 140px;
+  height: 100%;
 }
 .master {
-  position: relative;
-  margin-bottom: 10px;
-}
-.master::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 1px;
-  background: #fff;
-  bottom: -5px;
-  left: -3px;
+  border-bottom: 1px solid;
+  margin-bottom: 7px;
+  padding-bottom: 6px;
 }
 .team-red {
-  background: rgba(255, 0, 0, 0.4);
-  border-left: 2px solid red;
+  border-left: #ff6450 2px solid;
+  background: rgba(255, 100, 80, 0.08);
 }
 .team-blue {
-  background: rgba(0, 0, 255, 0.3);
-  border-right: 2px solid blue;
+  border-right: #50bbff 2px solid;
+  background: rgba(80, 187, 255, 0.1);
 }
 .members__row {
   display: flex;
@@ -151,7 +142,6 @@ export default defineComponent({
 }
 .members {
   flex-grow: 1;
-  padding: 3px;
 }
 .team-red .unsolved {
   color: #ff6450;
@@ -161,14 +151,16 @@ export default defineComponent({
 }
 .unsolved {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 200px;
-}
-.unsolved span {
   font-size: 215px;
+  font-weight: 700;
   font-family: "Roboto Condensed", sans-serif;
-  opacity: 0.5;
+  bottom: 14%;
+  opacity: 0.2;
+  user-select: none;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
 .hint {
   margin-bottom: 10px;

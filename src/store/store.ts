@@ -242,6 +242,7 @@ export const useGameStore = defineStore("game", {
         }
         players = players.filter((elem) => elem !== currentPlayer);
       }
+      this.RestartGame();
     },
   },
 });

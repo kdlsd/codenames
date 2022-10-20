@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomePage from "@/pages/HomePage.vue";
 import GamePage from "@/pages/GamePage.vue";
+import StartedGamePage from "@/pages/StartedGamePage.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {

@@ -1,11 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap');
 * {
   box-sizing: border-box;
 }
 body {
   background: #222;
-  color: #fff;
+  color: #cccaca;
 }
 a {
-  color: #fff;
+  color: #cccaca;
   text-decoration: none;
 }

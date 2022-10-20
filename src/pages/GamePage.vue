@@ -105,6 +105,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   gap: 10vw;
+  height: 100%;
+  max-height: 600px;
 }
 
 .buttons {
