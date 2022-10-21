@@ -48,6 +48,7 @@
       <game-board :board="game.board" class="game-board" />
       <team-block :teamColor="'blue'"></team-block>
     </div>
+    <game-settings />
   </div>
 </template>
 
@@ -59,6 +60,7 @@ import { useRoute } from "vue-router";
 import { onMounted } from "vue-demi";
 import { useGameStore } from "@/store/store";
 import ModalWithInput from "@/components/ModalWithInput.vue";
+import GameSettings from "@/components/GameSettings.vue";
 
 const route = useRoute();
 const store = useGameStore();

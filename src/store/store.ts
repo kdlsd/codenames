@@ -13,6 +13,7 @@ interface GameState {
   isMasterGiveHint: boolean;
   valueOfTimerMaster: number;
   valueOfTimerMembers: number;
+  valueOfAddingTime: number;
   timeForMaster: number;
   timeForMembers: number;
   currentTimer: string;
@@ -53,6 +54,7 @@ export const useGameStore = defineStore("game", {
       isMasterGiveHint: true,
       valueOfTimerMaster: 61,
       valueOfTimerMembers: 61,
+      valueOfAddingTime: 15,
       timeForMaster: 61,
       timeForMembers: 61,
       currentTimer: "",
@@ -136,6 +138,8 @@ export const useGameStore = defineStore("game", {
       }
       if (this.SearchPlayer.team !== color) {
         this.SwitchTurn();
+      } else {
+        this.timeForMembers += this.valueOfAddingTime;
       }
     },
     EndGame(): void {
