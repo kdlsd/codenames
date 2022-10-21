@@ -18,6 +18,7 @@ interface GameState {
   timeForMembers: number;
   currentTimer: string;
   idForStopTimer: null | number;
+  idForStopPickCard: null | number;
   isModalOpen: boolean;
   isMasterUseMembersTime: boolean;
 }
@@ -41,11 +42,36 @@ export const useGameStore = defineStore("game", {
           place: null,
           team: null,
           id: getCookie("id"),
+          pickedCard: null,
         },
-        { nickname: "Влад", place: "member", team: "red", id: "122" },
-        { nickname: "Антон", place: "master", team: "blue", id: "123" },
-        { nickname: "Вася", place: "member", team: "red", id: "124" },
-        { nickname: "Инна", place: "member", team: "red", id: "125" },
+        {
+          nickname: "Влад",
+          place: "member",
+          team: "blue",
+          id: "122",
+          pickedCard: null,
+        },
+        {
+          nickname: "Антон",
+          place: "member",
+          team: "blue",
+          id: "123",
+          pickedCard: null,
+        },
+        {
+          nickname: "Вася",
+          place: "member",
+          team: "blue",
+          id: "124",
+          pickedCard: null,
+        },
+        {
+          nickname: "Инна",
+          place: "member",
+          team: "blue",
+          id: "125",
+          pickedCard: null,
+        },
       ],
       board: genWords(),
       turn: "red",
@@ -59,6 +85,7 @@ export const useGameStore = defineStore("game", {
       timeForMembers: 61,
       currentTimer: "",
       idForStopTimer: null,
+      idForStopPickCard: null,
       isModalOpen: false,
       isMasterUseMembersTime: false,
     } as GameState;
@@ -85,6 +112,12 @@ export const useGameStore = defineStore("game", {
       return this.board.filter(
         (word) => word.color === "blue" && !word.revealed
       ).length;
+    },
+    PlayersInRedTeam(): Array<Player> {
+      return this.players.filter((player) => player.team === "red");
+    },
+    PlayersInBlueTeam(): Array<Player> {
+      return this.players.filter((player) => player.team === "blue");
     },
   },
 
@@ -113,11 +146,54 @@ export const useGameStore = defineStore("game", {
         this.isGameOn &&
         !this.isMasterGiveHint
       ) {
-        this.board.find((word) => word === card).revealed = true;
-        this.CheckTurn(card.color);
+        if (this.SearchPlayer.pickedCard === card) {
+          this.SearchPlayer.pickedCard = null;
+          card.isPicking = false;
+          clearTimeout(this.idForStopPickCard);
+        } else {
+          if (this.idForStopPickCard) {
+            card.isPicking = false;
+            clearTimeout(this.idForStopPickCard);
+          }
+          if (this.SearchPlayer.pickedCard !== null)
+            this.SearchPlayer.pickedCard.isPicking = false;
+          this.SearchPlayer.pickedCard = card;
+        }
+        if (this.turn === "red") {
+          if (
+            this.PlayersInRedTeam.length ===
+            this.PlayersInRedTeam.filter((player) => player.pickedCard === card)
+              .length
+          ) {
+            this.CreateTimerForPickCard(card);
+          }
+        } else {
+          if (
+            this.players.length ===
+            this.PlayersInBlueTeam.filter(
+              (player) => player.pickedCard === card
+            )
+          ) {
+            this.CreateTimerForPickCard(card);
+          }
+        }
       }
       if (this.UnsolvedBlueWords === 0 || this.UnsolvedRedWords === 0)
         this.EndGame();
+    },
+    OpenCard(card: Word): void {
+      card.isPicking = false;
+      this.board.find((word) => word === card).revealed = true;
+      this.CheckTurn(card.color);
+      if (this.turn === "blue") {
+        this.PlayersInBlueTeam.map((player) => (player.pickedCard = null));
+      } else {
+        this.PlayersInRedTeam.map((player) => (player.pickedCard = null));
+      }
+    },
+    CreateTimerForPickCard(card: Word): void {
+      card.isPicking = true;
+      this.idForStopPickCard = setTimeout(this.OpenCard, 1500, card);
     },
     SwitchTurn(): void {
       if (this.turn === "red") {
@@ -130,6 +206,7 @@ export const useGameStore = defineStore("game", {
       clearInterval(this.idForStopTimer);
       this.SetDefaultTimer();
       this.SetIntervalForTimer("timeForMaster");
+      this.players.map((player) => (player.pickedCard = null));
     },
     CheckTurn(color: string): void {
       if (color === "black") {
@@ -157,6 +234,7 @@ export const useGameStore = defineStore("game", {
       clearInterval(this.idForStopTimer);
       this.SetDefaultTimer();
       this.SetСurrentTimer("timeForMaster");
+      this.players.map((player) => (player.pickedCard = null));
     },
     CorrectUnsolvedWords(team: string): number {
       return team === "red" ? this.UnsolvedRedWords : this.UnsolvedBlueWords;

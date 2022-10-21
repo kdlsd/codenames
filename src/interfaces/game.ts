@@ -9,6 +9,7 @@ export interface Word {
   text: string;
   color: Color;
   revealed?: boolean;
+  isPicking: boolean;
 }
 
 export interface Board {

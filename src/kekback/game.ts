@@ -10,7 +10,7 @@ const r = (arr: any[]) => {
 
 const pick = (n: number, color: Color): any[] => {
   return new Array(n)
-        .fill(null).map(() => ({ color, text: r(words), revealed: false }));
+        .fill(null).map(() => ({ color, text: r(words), revealed: false, isPicking: false }));
 };
 
 export const genWords = () => {

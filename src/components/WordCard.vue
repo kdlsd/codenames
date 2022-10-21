@@ -7,13 +7,31 @@
     ]"
   >
     <span>{{ word.text }}</span>
+    <div class="players">
+      <span
+        v-for="player in store.players.filter(
+          (value) => value?.pickedCard === props.word
+        )"
+        :key="player.id"
+      >
+        {{ player.nickname }}</span
+      >
+    </div>
+    <div
+      class="pick__line"
+      :class="{
+        red: store.turn === 'red',
+        blue: store.turn === 'blue',
+        active: props.word.isPicking,
+      }"
+    ></div>
   </div>
 </template>
 
 <script lang="ts">
 import { Word } from "@/interfaces/game";
 import { useGameStore } from "@/store/store";
-import { computed, defineComponent, PropType, ref } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
@@ -29,7 +47,7 @@ export default defineComponent({
         return props.word.color;
       return "unknown";
     });
-    return { color, store };
+    return { color, store, props };
   },
 });
 </script>
@@ -47,6 +65,7 @@ export default defineComponent({
   text-transform: uppercase;
   font-weight: bold;
   font-family: "Roboto Condensed", sans-serif;
+  overflow: hidden;
 }
 .card span {
   user-select: none;
@@ -83,5 +102,32 @@ export default defineComponent({
   z-index: 1;
   background: #000;
   opacity: 0.7;
+}
+.players {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  font-size: 14px;
+}
+.players span {
+  display: inline-block;
+  margin-right: 5px;
+}
+.pick__line {
+  width: 0;
+  height: 4px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+.pick__line.active {
+  width: 100%;
+  transition: width 1.5s linear;
+}
+.pick__line.blue {
+  background: #50bbff;
+}
+.pick__line.red {
+  background: #ff6450;
 }
 </style>
