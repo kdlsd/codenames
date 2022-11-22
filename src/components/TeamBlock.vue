@@ -23,7 +23,8 @@
         @click="store.SwitchPlace(placeMaster, props.teamColor)"
         :place="placeMaster"
         v-show="
-          store.PlayersOnThisTeam(props.teamColor, placeMaster).length === 0
+          store.PlayersOnThisTeam(props.teamColor, placeMaster).length === 0 &&
+          !store.placeholdersIsLock
         "
         >Стать капитаном</join-to-placeholder
       >
@@ -40,7 +41,10 @@
       </div>
       <join-to-placeholder
         :place="placeMember"
-        v-show="!store.HidePlaceholderTojoin(props.teamColor, 'member')"
+        v-show="
+          !store.HidePlaceholderTojoin(props.teamColor, 'member') &&
+          !store.placeholdersIsLock
+        "
         @click="store.SwitchPlace(placeMember, props.teamColor)"
         >Стать игроком</join-to-placeholder
       >
@@ -50,7 +54,7 @@
     </div>
     <div
       class="timer"
-      v-show="store.turn === props.teamColor && store.isGameOn"
+      v-show="store.turn === props.teamColor && store.board !== null"
     >
       <span>Log</span>
       <span>{{ store.currentTimer }}</span>
@@ -73,7 +77,7 @@
           store.isMasterGiveHint &&
           store.SearchPlayer?.place === 'master' &&
           store.SearchPlayer?.team === props.teamColor &&
-          store.isGameOn
+          store.gameStatus === 'playing'
         "
         @keydown.enter="addHint()"
         class="hint__input"

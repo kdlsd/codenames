@@ -6,10 +6,10 @@ import { genWords } from "@/kekback/game";
 
 interface GameState {
   players: Array<Player>;
-  board: Array<Word>;
+  board: Array<Word> | null;
   turn: string;
   hints: Hints;
-  isGameOn: boolean;
+  gameStatus: string;
   isMasterGiveHint: boolean;
   valueOfFirstTimerMaster: number;
   valueOfTimerMaster: number;
@@ -23,6 +23,7 @@ interface GameState {
   isModalOpen: boolean;
   isMasterUseMembersTime: boolean;
   isFirstTurn: boolean;
+  placeholdersIsLock: boolean;
 }
 
 interface Hints {
@@ -46,7 +47,7 @@ export const useGameStore = defineStore("game", {
           id: getCookie("id"),
           pickedCard: null,
         },
-        {
+        /*{
           nickname: "Влад",
           place: "member",
           team: "blue",
@@ -73,12 +74,12 @@ export const useGameStore = defineStore("game", {
           team: "blue",
           id: "125",
           pickedCard: null,
-        },
+        },*/
       ],
-      board: genWords(),
+      board: null,
       turn: "red",
       hints: { red: [], blue: [] },
-      isGameOn: false,
+      gameStatus: "beforeStart",
       isMasterGiveHint: true,
       valueOfFirstTimerMaster: 120,
       valueOfTimerMaster: 60,
@@ -92,6 +93,7 @@ export const useGameStore = defineStore("game", {
       isModalOpen: false,
       isMasterUseMembersTime: false,
       isFirstTurn: true,
+      placeholdersIsLock: false,
     } as GameState;
   },
 
@@ -109,11 +111,12 @@ export const useGameStore = defineStore("game", {
       return this.SearchPlayer.team === this.turn;
     },
     UnsolvedRedWords(): number {
-      return this.board.filter((word) => word.color === "red" && !word.revealed)
-        .length;
+      return this.board?.filter(
+        (word) => word.color === "red" && !word.revealed
+      ).length;
     },
     UnsolvedBlueWords(): number {
-      return this.board.filter(
+      return this.board?.filter(
         (word) => word.color === "blue" && !word.revealed
       ).length;
     },
@@ -147,7 +150,7 @@ export const useGameStore = defineStore("game", {
     SelectCard(card: Word): void {
       if (
         this.HasPermissionToOpenCard &&
-        this.isGameOn &&
+        this.gameStatus === "playing" &&
         !this.isMasterGiveHint
       ) {
         if (this.SearchPlayer.pickedCard === card) {
@@ -173,10 +176,10 @@ export const useGameStore = defineStore("game", {
           }
         } else {
           if (
-            this.players.length ===
+            this.PlayersInBlueTeam.length ===
             this.PlayersInBlueTeam.filter(
               (player) => player.pickedCard === card
-            )
+            ).length
           ) {
             this.CreateTimerForPickCard(card);
           }
@@ -224,7 +227,7 @@ export const useGameStore = defineStore("game", {
       }
     },
     EndGame(): void {
-      this.isGameOn = false;
+      this.gameStatus = "end";
       this.board.map((elem) => (elem.revealed = true));
       clearInterval(this.idForStopTimer);
       this.SetDefaultTimer();
@@ -232,7 +235,7 @@ export const useGameStore = defineStore("game", {
     RestartGame(): void {
       this.board = genWords();
       this.turn = "red";
-      this.isGameOn = false;
+      this.gameStatus = "playing";
       this.isMasterGiveHint = true;
       this.hints = { red: [], blue: [] };
       clearInterval(this.idForStopTimer);
@@ -240,6 +243,7 @@ export const useGameStore = defineStore("game", {
       this.SetСurrentTimer("timeForMaster");
       this.players.map((player) => (player.pickedCard = null));
       this.isFirstTurn = true;
+      this.StartGame();
     },
     CorrectUnsolvedWords(team: string): number {
       return team === "red" ? this.UnsolvedRedWords : this.UnsolvedBlueWords;
@@ -256,25 +260,32 @@ export const useGameStore = defineStore("game", {
       this.SetIntervalForTimer("timeForMembers");
     },
     StartGame() {
-      this.isGameOn = true;
-      this.SetIntervalForTimer("timeForMaster");
+      this.gameStatus = "playing";
+      this.placeholdersIsLock = true;
+      if (this.isMasterGiveHint) {
+        this.SetIntervalForTimer("timeForMaster");
+      } else {
+        this.SetIntervalForTimer("timeForMembers");
+      }
+      if (this.board === null) this.board = genWords();
+    },
+    StopGame() {
+      this.gameStatus = "stoped";
+      clearInterval(this.idForStopTimer);
     },
     SetIntervalForTimer(place: string) {
       if (this.isFirstTurn) {
         this.timeForMaster = this.valueOfFirstTimerMaster;
         this.isFirstTurn = false;
-      } else {
-        this.timeForMaster = this.valueOfTimerMaster;
       }
 
-      if (!this.isMasterUseMembersTime)
-        this.timeForMembers = this.valueOfTimerMembers;
       this.SetTimer(place);
       this.idForStopTimer = setInterval(this.SetTimer, 1000, place);
     },
     SetTimer(place: string): void {
       this.SetСurrentTimer(place);
       if (this[place] === 0 && this.timeForMembers === 0) {
+        this.SetDefaultTimer;
         this.SwitchTurn();
         return;
       }
@@ -336,6 +347,9 @@ export const useGameStore = defineStore("game", {
         players = players.filter((elem) => elem !== currentPlayer);
       }
       this.RestartGame();
+    },
+    SwitchStateOfPlaceholders(): void {
+      this.placeholdersIsLock = !this.placeholdersIsLock;
     },
   },
 });

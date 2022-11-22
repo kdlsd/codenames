@@ -3,7 +3,9 @@
     <span>Наблюдатели: </span>
     <join-to-placeholder
       :isSpectator="true"
-      v-show="!store.HidePlaceholderTojoin(null, null)"
+      v-show="
+        !store.HidePlaceholderTojoin(null, null) && !store.placeholdersIsLock
+      "
       @click="store.SwitchPlace(place)"
       >...</join-to-placeholder
     >

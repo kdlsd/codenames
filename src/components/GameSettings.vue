@@ -67,6 +67,7 @@
         title="Перетасовать игроков"
         @click="store.ShufflePlayers()"
         class="btn material-symbols-outlined"
+        v-show="store.gameStatus != 'playing'"
       >
         casino
       </div>
@@ -76,16 +77,41 @@
         @click="store.RestartGame()"
         class="btn material-symbols-outlined"
         title="Рестарт игры"
+        v-show="store.board !== null"
       >
         sync
       </div>
       <div
         @click="store.StartGame"
-        v-show="!store.isGameOn"
+        v-show="store.gameStatus !== 'playing'"
         class="btn material-symbols-outlined"
         title="Старт"
       >
         play_arrow
+      </div>
+      <div
+        @click="store.StopGame"
+        v-show="store.gameStatus === 'playing'"
+        class="btn material-symbols-outlined"
+        title="Стоп"
+      >
+        pause
+      </div>
+      <div
+        @click="store.SwitchStateOfPlaceholders"
+        v-show="store.placeholdersIsLock"
+        class="btn material-symbols-outlined"
+        title="Разблокировать перемещение"
+      >
+        lock
+      </div>
+      <div
+        @click="store.SwitchStateOfPlaceholders"
+        v-show="!store.placeholdersIsLock"
+        class="btn material-symbols-outlined"
+        title="Заблокировать перемещение"
+      >
+        lock_open
       </div>
       <div
         @click="store.ChangeStateModal"
