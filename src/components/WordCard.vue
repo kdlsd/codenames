@@ -23,6 +23,7 @@
         red: store.turn === 'red',
         blue: store.turn === 'blue',
         active: props.word.isPicking,
+        master: store.SearchPlayer.place === 'master',
       }"
     ></div>
   </div>
@@ -127,7 +128,13 @@ export default defineComponent({
 .pick__line.blue {
   background: #50bbff;
 }
+.pick__line.blue.master {
+  background: rgb(58, 121, 255);
+}
 .pick__line.red {
   background: #ff6450;
+}
+.pick__line.red.master {
+  background: rgb(214, 24, 0);
 }
 </style>

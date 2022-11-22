@@ -96,7 +96,7 @@ export const useGameStore = defineStore("game", {
       return this.players.filter((elem) => elem.id === getCookie("id"))[0];
     },
     HasPermissionToWatchColor(): boolean {
-      return this.SearchPlayer.place === "master";
+      return this.SearchPlayer?.place === "master";
     },
     HasPermissionToOpenCard(): boolean {
       return this.SearchPlayer.place === "member" && this.IsCorrectTeamTurn;
@@ -315,11 +315,11 @@ export const useGameStore = defineStore("game", {
           currentPlayer.team = i === 0 ? "red" : "blue";
         } else {
           currentPlayer.place = "member";
-          if (players.length !== 1) {
-            currentPlayer.team = i % 2 === 0 ? "blue" : "red";
-          } else {
+          if (players.length === 1 && length % 2 === 1) {
             currentPlayer.team =
               Math.round(Math.random()) === 1 ? "blue" : "red";
+          } else {
+            currentPlayer.team = i % 2 === 0 ? "blue" : "red";
           }
         }
         players = players.filter((elem) => elem !== currentPlayer);
