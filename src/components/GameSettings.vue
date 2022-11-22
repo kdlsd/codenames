@@ -14,7 +14,7 @@
             step="1"
             min="10"
             max="999"
-            v-model="store.valueOfTimerMaster"
+            v-model="store.valueOfFirstTimerMaster"
           />
         </div>
         <div class="timer-item timer__master">

@@ -11,6 +11,7 @@ interface GameState {
   hints: Hints;
   isGameOn: boolean;
   isMasterGiveHint: boolean;
+  valueOfFirstTimerMaster: number;
   valueOfTimerMaster: number;
   valueOfTimerMembers: number;
   valueOfAddingTime: number;
@@ -21,6 +22,7 @@ interface GameState {
   idForStopPickCard: null | number;
   isModalOpen: boolean;
   isMasterUseMembersTime: boolean;
+  isFirstTurn: boolean;
 }
 
 interface Hints {
@@ -78,16 +80,18 @@ export const useGameStore = defineStore("game", {
       hints: { red: [], blue: [] },
       isGameOn: false,
       isMasterGiveHint: true,
-      valueOfTimerMaster: 61,
-      valueOfTimerMembers: 61,
+      valueOfFirstTimerMaster: 120,
+      valueOfTimerMaster: 60,
+      valueOfTimerMembers: 60,
       valueOfAddingTime: 15,
-      timeForMaster: 61,
-      timeForMembers: 61,
+      timeForMaster: 60,
+      timeForMembers: 60,
       currentTimer: "",
       idForStopTimer: null,
       idForStopPickCard: null,
       isModalOpen: false,
       isMasterUseMembersTime: false,
+      isFirstTurn: true,
     } as GameState;
   },
 
@@ -235,6 +239,7 @@ export const useGameStore = defineStore("game", {
       this.SetDefaultTimer();
       this.SetСurrentTimer("timeForMaster");
       this.players.map((player) => (player.pickedCard = null));
+      this.isFirstTurn = true;
     },
     CorrectUnsolvedWords(team: string): number {
       return team === "red" ? this.UnsolvedRedWords : this.UnsolvedBlueWords;
@@ -255,14 +260,19 @@ export const useGameStore = defineStore("game", {
       this.SetIntervalForTimer("timeForMaster");
     },
     SetIntervalForTimer(place: string) {
-      this.timeForMaster = this.valueOfTimerMaster;
+      if (this.isFirstTurn) {
+        this.timeForMaster = this.valueOfFirstTimerMaster;
+        this.isFirstTurn = false;
+      } else {
+        this.timeForMaster = this.valueOfTimerMaster;
+      }
+
       if (!this.isMasterUseMembersTime)
         this.timeForMembers = this.valueOfTimerMembers;
       this.SetTimer(place);
       this.idForStopTimer = setInterval(this.SetTimer, 1000, place);
     },
     SetTimer(place: string): void {
-      this[place] -= 1;
       this.SetСurrentTimer(place);
       if (this[place] === 0 && this.timeForMembers === 0) {
         this.SwitchTurn();
@@ -274,6 +284,7 @@ export const useGameStore = defineStore("game", {
         this.timeForMembers = this.valueOfTimerMembers;
         this.SetIntervalForTimer("timeForMembers");
       }
+      this[place] -= 1;
     },
     SetDefaultTimer(): void {
       this.timeForMaster = this.valueOfTimerMaster;
