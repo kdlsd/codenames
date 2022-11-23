@@ -67,6 +67,15 @@
           :key="index"
         >
           {{ hint }}
+          <span
+            @click="store.SetCurrentHint(props.teamColor, index)"
+            v-show="
+              store.CurrentPlayer.team === props.teamColor &&
+              store.CurrentPlayer.place === 'master'
+            "
+            class="edit material-symbols-outlined"
+            >edit</span
+          >
         </li>
       </ul>
       <input
@@ -188,6 +197,17 @@ export default defineComponent({
 }
 .hint {
   margin-bottom: 10px;
+  &__item:hover {
+    .edit {
+      display: inline;
+    }
+  }
+}
+.edit {
+  display: none;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 5px;
 }
 .hint::before {
   content: "";

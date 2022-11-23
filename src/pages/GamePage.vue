@@ -1,8 +1,19 @@
 <template>
   <div class="game">
     <div class="buttons"></div>
-    <modal-with-input v-show="store.isModalOpen"
+    <modal-with-input
+      @send-value="store.ChangeNickname"
+      :startedValue="store.CurrentPlayer.nickname"
+      v-if="store.currentModal === 'nickname'"
       >Введите новый никнейм</modal-with-input
+    >
+    <modal-with-input
+      @send-value="store.ChangeHint"
+      :startedValue="
+        store.hints[store.currentHint.color][store.currentHint.index]
+      "
+      v-if="store.currentModal === 'hint'"
+      >Измените подсказку</modal-with-input
     >
 
     <spectators-block />
@@ -20,7 +31,6 @@ import TeamBlock from "@/components/TeamBlock.vue";
 import GameBoard from "@/components/GameBoard.vue";
 import SpectatorsBlock from "@/components/SpectatorsBlock.vue";
 import { useRoute } from "vue-router";
-import { onMounted } from "vue-demi";
 import { useGameStore } from "@/store/store";
 import ModalWithInput from "@/components/ModalWithInput.vue";
 import GameSettings from "@/components/GameSettings.vue";

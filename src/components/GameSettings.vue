@@ -114,7 +114,7 @@
         lock_open
       </div>
       <div
-        @click="store.ChangeStateModal"
+        @click="store.OpenModal('nickname')"
         class="btn material-symbols-outlined"
         title="Сменить никнейм"
       >

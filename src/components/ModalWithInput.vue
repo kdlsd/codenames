@@ -5,27 +5,47 @@
         <slot></slot>
       </p>
       <input
-        @keydown.enter="store.ChangeNickname(value)"
-        v-model="value"
+        @keydown.enter="sendValue(newValue)"
+        v-model="newValue"
         type="text"
         class="modal__input"
       />
-      <button @click="store.ChangeStateModal" class="modal__btn">X</button>
+      <button @click="store.CloseModal()" class="modal__btn">X</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { useGameStore } from "@/store/store";
 import { defineComponent } from "vue";
 
 export default defineComponent({
   setup() {
-    const store = useGameStore();
-    const value = store.CurrentPlayer?.nickname || "";
-    return { store, value };
+    return {};
   },
 });
+</script>
+
+<script setup lang="ts">
+import { defineEmits, defineProps, ref } from "vue";
+import { useGameStore } from "@/store/store";
+const store = useGameStore();
+const props = defineProps({
+  startedValue: {
+    required: false,
+    default: "",
+    value: String,
+  },
+});
+const newValue = ref(props.startedValue);
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: string): void;
+  (e: "sendValue", value: string): void;
+}>();
+
+function sendValue(value: string) {
+  emit("sendValue", value);
+}
 </script>
 
 <style scoped>

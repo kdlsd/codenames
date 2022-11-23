@@ -3,8 +3,6 @@ import Player from "@/interfaces/Player";
 import getCookie from "@/scripts/getCookies";
 import { Word } from "@/interfaces/game";
 import { genWords } from "@/kekback/game";
-import { createDOMCompilerError } from "@vue/compiler-dom";
-import { getTransitionRawChildren } from "vue";
 
 interface GameState {
   players: Array<Player>;
@@ -24,9 +22,11 @@ interface GameState {
   idForStopPickCard: null | number;
   idForStopEndTurn: null | number;
   isModalOpen: boolean;
+  currentModal: string | null;
   isMasterUseMembersTime: boolean;
   isFirstTurn: boolean;
   placeholdersIsLock: boolean;
+  currentHint: object | null;
 }
 
 interface Hints {
@@ -95,9 +95,11 @@ export const useGameStore = defineStore("game", {
       idForStopPickCard: null,
       idForStopEndTurn: null,
       isModalOpen: false,
+      currentModal: null,
       isMasterUseMembersTime: false,
       isFirstTurn: true,
       placeholdersIsLock: false,
+      currentHint: null,
     } as GameState;
   },
 
@@ -152,6 +154,13 @@ export const useGameStore = defineStore("game", {
         const fullCookie = id + "; max-age=10000000";
         document.cookie = fullCookie;
       }
+    },
+    SetCurrentHint(color: string, index: number): void {
+      this.currentHint = {
+        color: color,
+        index: index,
+      };
+      this.currentModal = "hint";
     },
     SelectCard(card: Word): void {
       if (
@@ -363,13 +372,20 @@ export const useGameStore = defineStore("game", {
       this.currentTimer =
         timer.minutes.toString() + ":" + timer.seconds.toString();
     },
-    ChangeStateModal(): void {
-      this.isModalOpen = !this.isModalOpen;
+    CloseModal(): void {
+      this.currentModal = null;
+    },
+    OpenModal(value: string): void {
+      this.currentModal = value;
     },
     ChangeNickname(nickname: string): void {
       document.cookie = "nickname=" + nickname + "; max-age=10000000";
       this.CurrentPlayer.nickname = nickname;
-      this.ChangeStateModal();
+      this.CloseModal();
+    },
+    ChangeHint(hint: string): void {
+      this.hints[this.currentHint.color][this.currentHint.index] = hint;
+      this.CloseModal();
     },
     CheckNickname(): void {
       if (getCookie("nickname") === undefined) this.isModalOpen = true;
