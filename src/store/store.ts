@@ -3,13 +3,15 @@ import Player from "@/interfaces/Player";
 import getCookie from "@/scripts/getCookies";
 import { Word } from "@/interfaces/game";
 import { genWords } from "@/kekback/game";
+import { createDOMCompilerError } from "@vue/compiler-dom";
+import { getTransitionRawChildren } from "vue";
 
 interface GameState {
   players: Array<Player>;
   board: Array<Word> | null;
   turn: string;
   hints: Hints;
-  gameStatus: string;
+  gameState: string;
   isMasterGiveHint: boolean;
   valueOfFirstTimerMaster: number;
   valueOfTimerMaster: number;
@@ -20,6 +22,7 @@ interface GameState {
   currentTimer: string;
   idForStopTimer: null | number;
   idForStopPickCard: null | number;
+  idForStopEndTurn: null | number;
   isModalOpen: boolean;
   isMasterUseMembersTime: boolean;
   isFirstTurn: boolean;
@@ -47,7 +50,7 @@ export const useGameStore = defineStore("game", {
           id: getCookie("id"),
           pickedCard: null,
         },
-        /*{
+        {
           nickname: "Влад",
           place: "member",
           team: "blue",
@@ -71,15 +74,15 @@ export const useGameStore = defineStore("game", {
         {
           nickname: "Инна",
           place: "member",
-          team: "blue",
+          team: "red",
           id: "125",
           pickedCard: null,
-        },*/
+        },
       ],
       board: null,
       turn: "red",
       hints: { red: [], blue: [] },
-      gameStatus: "beforeStart",
+      gameState: "beforeStart",
       isMasterGiveHint: true,
       valueOfFirstTimerMaster: 120,
       valueOfTimerMaster: 60,
@@ -90,6 +93,7 @@ export const useGameStore = defineStore("game", {
       currentTimer: "",
       idForStopTimer: null,
       idForStopPickCard: null,
+      idForStopEndTurn: null,
       isModalOpen: false,
       isMasterUseMembersTime: false,
       isFirstTurn: true,
@@ -98,17 +102,17 @@ export const useGameStore = defineStore("game", {
   },
 
   getters: {
-    SearchPlayer(): Player {
+    CurrentPlayer(): Player {
       return this.players.filter((elem) => elem.id === getCookie("id"))[0];
     },
     HasPermissionToWatchColor(): boolean {
-      return this.SearchPlayer?.place === "master";
+      return this.CurrentPlayer?.place === "master";
     },
     HasPermissionToOpenCard(): boolean {
-      return this.SearchPlayer.place === "member" && this.IsCorrectTeamTurn;
+      return this.CurrentPlayer.place === "member" && this.IsCorrectTeamTurn;
     },
     IsCorrectTeamTurn(): boolean {
-      return this.SearchPlayer.team === this.turn;
+      return this.CurrentPlayer.team === this.turn;
     },
     UnsolvedRedWords(): number {
       return this.board?.filter(
@@ -138,23 +142,25 @@ export const useGameStore = defineStore("game", {
       );
     },
     SwitchPlace(place, team = null): void {
-      this.SearchPlayer.place = place;
-      this.SearchPlayer.team = team;
+      this.CurrentPlayer.place = place;
+      this.CurrentPlayer.team = team;
     },
     SetIdForPlayer(): void {
       if (getCookie("id") === undefined) {
-        const id = "id=" + Math.ceil(Math.random() * 10000);
-        document.cookie = id;
+        const randomId = Math.ceil(Math.random() * 10000);
+        const id = "id=" + randomId;
+        const fullCookie = id + "; max-age=10000000";
+        document.cookie = fullCookie;
       }
     },
     SelectCard(card: Word): void {
       if (
         this.HasPermissionToOpenCard &&
-        this.gameStatus === "playing" &&
+        this.gameState === "playing" &&
         !this.isMasterGiveHint
       ) {
-        if (this.SearchPlayer.pickedCard === card) {
-          this.SearchPlayer.pickedCard = null;
+        if (this.CurrentPlayer.pickedCard === card) {
+          this.CurrentPlayer.pickedCard = null;
           card.isPicking = false;
           clearTimeout(this.idForStopPickCard);
         } else {
@@ -162,9 +168,16 @@ export const useGameStore = defineStore("game", {
             card.isPicking = false;
             clearTimeout(this.idForStopPickCard);
           }
-          if (this.SearchPlayer.pickedCard !== null)
-            this.SearchPlayer.pickedCard.isPicking = false;
-          this.SearchPlayer.pickedCard = card;
+          if (this.idForStopEndTurn) {
+            clearTimeout(this.idForStopEndTurn);
+            this.idForStopEndTurn = null;
+          }
+          if (
+            this.CurrentPlayer.pickedCard !== null &&
+            this.CurrentPlayer.pickedCard !== "endTurn"
+          )
+            this.CurrentPlayer.pickedCard.isPicking = false;
+          this.CurrentPlayer.pickedCard = card;
         }
         if (this.turn === "red") {
           if (
@@ -202,12 +215,51 @@ export const useGameStore = defineStore("game", {
       card.isPicking = true;
       this.idForStopPickCard = setTimeout(this.OpenCard, 1500, card);
     },
+    CreateTimerForEndTurn(): void {
+      this.idForStopEndTurn = setTimeout(this.SwitchTurn, 1500);
+    },
+    SelectSwitchTurn(): void {
+      if (
+        this.CurrentPlayer.pickedCard !== "endTurn" &&
+        this.CurrentPlayer.pickedCard !== null
+      ) {
+        this.CurrentPlayer.pickedCard.isPicking = false;
+        clearTimeout(this.idForStopPickCard);
+      }
+      if (this.CurrentPlayer.pickedCard === "endTurn") {
+        this.CurrentPlayer.pickedCard = null;
+        clearTimeout(this.idForStopEndTurn);
+        this.idForStopEndTurn = null;
+        return;
+      }
+      this.CurrentPlayer.pickedCard = "endTurn";
+      if (this.turn === "red") {
+        if (
+          this.PlayersInRedTeam.length ===
+          this.PlayersInRedTeam.filter(
+            (player) => player.pickedCard === "endTurn"
+          ).length
+        ) {
+          this.CreateTimerForEndTurn();
+        }
+      } else {
+        if (
+          this.PlayersInBlueTeam.length ===
+          this.PlayersInBlueTeam.filter(
+            (player) => player.pickedCard === "endTurn"
+          ).length
+        ) {
+          this.CreateTimerForEndTurn();
+        }
+      }
+    },
     SwitchTurn(): void {
       if (this.turn === "red") {
         this.turn = "blue";
       } else {
         this.turn = "red";
       }
+      this.idForStopEndTurn = null;
       this.isMasterGiveHint = true;
       this.isMasterUseMembersTime = false;
       clearInterval(this.idForStopTimer);
@@ -220,14 +272,14 @@ export const useGameStore = defineStore("game", {
         this.EndGame();
         return;
       }
-      if (this.SearchPlayer.team !== color) {
+      if (this.CurrentPlayer.team !== color) {
         this.SwitchTurn();
       } else {
         this.timeForMembers += this.valueOfAddingTime;
       }
     },
     EndGame(): void {
-      this.gameStatus = "end";
+      this.gameState = "end";
       this.board.map((elem) => (elem.revealed = true));
       clearInterval(this.idForStopTimer);
       this.SetDefaultTimer();
@@ -235,7 +287,7 @@ export const useGameStore = defineStore("game", {
     RestartGame(): void {
       this.board = genWords();
       this.turn = "red";
-      this.gameStatus = "playing";
+      this.gameState = "playing";
       this.isMasterGiveHint = true;
       this.hints = { red: [], blue: [] };
       clearInterval(this.idForStopTimer);
@@ -250,7 +302,7 @@ export const useGameStore = defineStore("game", {
     },
     HidePlaceholderTojoin(team: string, place: string): boolean {
       return (
-        this.SearchPlayer?.team === team && this.SearchPlayer.place === place
+        this.CurrentPlayer?.team === team && this.CurrentPlayer.place === place
       );
     },
     AddHint(team: string, hint: string): void {
@@ -260,7 +312,7 @@ export const useGameStore = defineStore("game", {
       this.SetIntervalForTimer("timeForMembers");
     },
     StartGame() {
-      this.gameStatus = "playing";
+      this.gameState = "playing";
       this.placeholdersIsLock = true;
       if (this.isMasterGiveHint) {
         this.SetIntervalForTimer("timeForMaster");
@@ -270,7 +322,7 @@ export const useGameStore = defineStore("game", {
       if (this.board === null) this.board = genWords();
     },
     StopGame() {
-      this.gameStatus = "stoped";
+      this.gameState = "stoped";
       clearInterval(this.idForStopTimer);
     },
     SetIntervalForTimer(place: string) {
@@ -279,10 +331,10 @@ export const useGameStore = defineStore("game", {
         this.isFirstTurn = false;
       }
 
-      this.SetTimer(place);
-      this.idForStopTimer = setInterval(this.SetTimer, 1000, place);
+      this.DecreaseTimer(place);
+      this.idForStopTimer = setInterval(this.DecreaseTimer, 1000, place);
     },
-    SetTimer(place: string): void {
+    DecreaseTimer(place: string): void {
       this.SetСurrentTimer(place);
       if (this[place] === 0 && this.timeForMembers === 0) {
         this.SetDefaultTimer;
@@ -315,8 +367,8 @@ export const useGameStore = defineStore("game", {
       this.isModalOpen = !this.isModalOpen;
     },
     ChangeNickname(nickname: string): void {
-      document.cookie = "nickname=" + nickname;
-      this.SearchPlayer.nickname = nickname;
+      document.cookie = "nickname=" + nickname + "; max-age=10000000";
+      this.CurrentPlayer.nickname = nickname;
       this.ChangeStateModal();
     },
     CheckNickname(): void {

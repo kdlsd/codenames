@@ -67,7 +67,7 @@
         title="Перетасовать игроков"
         @click="store.ShufflePlayers()"
         class="btn material-symbols-outlined"
-        v-show="store.gameStatus != 'playing'"
+        v-show="store.gameState != 'playing'"
       >
         casino
       </div>
@@ -83,7 +83,7 @@
       </div>
       <div
         @click="store.StartGame"
-        v-show="store.gameStatus !== 'playing'"
+        v-show="store.gameState !== 'playing'"
         class="btn material-symbols-outlined"
         title="Старт"
       >
@@ -91,7 +91,7 @@
       </div>
       <div
         @click="store.StopGame"
-        v-show="store.gameStatus === 'playing'"
+        v-show="store.gameState === 'playing'"
         class="btn material-symbols-outlined"
         title="Стоп"
       >

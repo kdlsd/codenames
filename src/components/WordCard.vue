@@ -23,7 +23,7 @@
         red: store.turn === 'red',
         blue: store.turn === 'blue',
         active: props.word.isPicking,
-        master: store.SearchPlayer?.place === 'master',
+        master: store.CurrentPlayer?.place === 'master',
       }"
     ></div>
   </div>

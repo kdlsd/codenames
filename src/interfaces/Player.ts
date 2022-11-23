@@ -5,5 +5,5 @@ export default interface Player {
   place: string | null;
   id: string | number;
   team?: string;
-  pickedCard?: Word;
+  pickedCard?: Word | string;
 }

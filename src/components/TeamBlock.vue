@@ -75,13 +75,33 @@
         v-show="
           store.turn === props.teamColor &&
           store.isMasterGiveHint &&
-          store.SearchPlayer?.place === 'master' &&
-          store.SearchPlayer?.team === props.teamColor &&
-          store.gameStatus === 'playing'
+          store.CurrentPlayer?.place === 'master' &&
+          store.CurrentPlayer?.team === props.teamColor &&
+          store.gameState === 'playing'
         "
         @keydown.enter="addHint()"
         class="hint__input"
       />
+    </div>
+    <div
+      v-show="
+        store.CurrentPlayer?.team === props.teamColor &&
+        store.CurrentPlayer?.place === 'member' &&
+        !store.isMasterGiveHint &&
+        store.gameState === 'playing'
+      "
+      class="endturn"
+      @click="store.SelectSwitchTurn"
+    >
+      Завершить ход
+      <div
+        class="pick__line"
+        :class="{
+          red: store.turn === 'red',
+          blue: store.turn === 'blue',
+          active: store.idForStopEndTurn,
+        }"
+      ></div>
     </div>
   </div>
 </template>
@@ -118,7 +138,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .team {
   padding: 8px;
   display: flex;
@@ -188,5 +208,29 @@ export default defineComponent({
 .timer {
   display: flex;
   justify-content: space-between;
+}
+.endturn {
+  display: inline-block;
+  width: 90%;
+  cursor: pointer;
+  margin-bottom: 10px;
+  border-bottom: 1px dotted #fff;
+}
+.pick__line {
+  width: 0;
+  height: 4px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  &.active {
+    width: 100%;
+    transition: width 1.5s linear;
+  }
+  &.blue {
+    background: #50bbff;
+  }
+  &.red {
+    background: #ff6450;
+  }
 }
 </style>
